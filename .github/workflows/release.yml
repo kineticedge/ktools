@@ -1,0 +1,75 @@
+name: Create release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+\.[0-9]+\.[0-9]+'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+      - name: Build with Gradle Wrapper
+        run: ./gradlew build -x test
+      - name: Set env
+        run: echo "VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ktools_cli
+          path: ./ktools-cli/build/distributions/ktools-cli-${{ env.VERSION }}.tar
+  release:
+    name: Release pushed tag
+    needs: [build]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Create release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+      - name: Set env
+        run: echo "VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
+      - name: Download build artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ktools_cli
+      - name: create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for file in $(ls ./*.tar); do
+            gh release upload ${{ env.VERSION }} $file --clobber
+          done
+#          gh release create ${{ github.ref }} ./ktools-cli/build/distributions/*.tar --title "Release ${{ github.ref }}"
+
+#      - name: Upload Release Asset
+#        id: upload-release-asset
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }}
+#          asset_path: ./ktools-cli/build/distributions/ktools-cli-${{env.VERSION}}.tar
+#          asset_name: ktools-cli-${{env.VERSION}}.jar
+#          asset_content_type: application/tar
+
