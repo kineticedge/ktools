@@ -9,7 +9,7 @@ import java.util.TreeMap;
 
 import static java.lang.System.out;
 
-@CommandLine.Command(name = "tool-command", description = "", subcommands = {KafkaTopicsTruncate.class})
+@CommandLine.Command(name = "tool-command", description = "", subcommands = {KafkaTopicsTruncate.class, KafkaConsoleConsumerFilter.class})
 public class ToolCommand implements Runnable {
 
   @CommandLine.Option(names = {"--help"}, usageHelp = true, description = "this help message.")
@@ -34,12 +34,14 @@ public class ToolCommand implements Runnable {
                 return new TreeMap<>(super.subcommands());
               }
             })
-            .setExecutionExceptionHandler((e, commandLine, parseResult) -> {
-              CommandLine.Help.ColorScheme colorScheme = commandLine.getColorScheme();
-              CommandLine.Help.Ansi.Text msg = colorScheme.errorText(e.getMessage());
-              console.err(CommandLine.Help.Ansi.AUTO.new Text(msg).toString());
-              return commandLine.getCommandSpec().exitCodeOnExecutionException();
-            })
+//            .setExecutionExceptionHandler((e, commandLine, parseResult) -> {
+//
+//              CommandLine.Help.ColorScheme colorScheme = commandLine.getColorScheme();
+//              CommandLine.Help.Ansi.Text msg = colorScheme.errorText(e.getMessage());
+//              console.err(CommandLine.Help.Ansi.AUTO.new Text(msg).toString());
+//
+//              return commandLine.getCommandSpec().exitCodeOnExecutionException();
+//            })
             .execute(args);
   }
 

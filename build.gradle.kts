@@ -3,10 +3,14 @@ import java.io.ByteArrayOutputStream
 
 val semantic_version: String by project
 
+val jackson_version: String by project
+val jsonpath_version: String by project
 val logback_version: String by project
 val apache_commons_version: String by project
 val kafka_version: String by project
 val slf4j_version: String by project
+val confluent_version: String by project
+val avro_version: String by project
 
 val picocli_version: String by project
 
@@ -56,10 +60,23 @@ subprojects {
         }
         implementation("org.slf4j:slf4j-api:$slf4j_version")
 
+        implementation("io.confluent:kafka-avro-serializer:$confluent_version")
+        implementation("io.confluent:kafka-json-schema-serializer:$confluent_version")
+        implementation("org.apache.avro:avro:$avro_version")
+
+        //
+        implementation("com.fasterxml.jackson.core:jackson-core:$jackson_version")
+        implementation("com.fasterxml.jackson.core:jackson-databind:$jackson_version")
+        implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson_version")
+
+        implementation("com.jayway.jsonpath:json-path:$jsonpath_version")
+
         runtimeOnly("ch.qos.logback:logback-classic:$logback_version")
 
+        //
         testImplementation("org.junit-pioneer:junit-pioneer:$junit_pioneer_version")
         testImplementation("org.junit.jupiter:junit-jupiter-api:$junit_version")
+        testImplementation("org.junit.jupiter:junit-jupiter-params:$junit_version")
         testImplementation("org.testcontainers:kafka:$testcontainer_kafka_version")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junit_version")
     }

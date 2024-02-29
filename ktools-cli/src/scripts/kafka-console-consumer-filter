@@ -1,0 +1,5 @@
+#!/bin/sh
+
+cd "$(dirname -- "$0")" || exit
+
+exec ./ktools-cli kafka-console-consumer-filter "$@"

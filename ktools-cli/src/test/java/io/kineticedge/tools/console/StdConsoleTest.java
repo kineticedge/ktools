@@ -9,8 +9,8 @@ class StdConsoleTest {
   void simpleTest() {
     Assertions.assertDoesNotThrow(() -> {
       StdConsole console = new StdConsole();
-      console.err("error");
-      console.out("out");
+      console.errPrintln("error");
+      console.println("out");
     });
   }
 }
