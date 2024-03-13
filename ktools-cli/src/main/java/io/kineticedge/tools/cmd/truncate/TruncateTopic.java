@@ -1,7 +1,6 @@
 package io.kineticedge.tools.cmd.truncate;
 
 import io.kineticedge.tools.console.Console;
-import io.kineticedge.tools.console.StdConsole;
 import io.kineticedge.tools.exception.CommandException;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.admin.AlterConfigOp;
@@ -49,19 +48,19 @@ public class TruncateTopic implements Closeable {
     long count = numberOfMessages(topic, earliestOffsets, latestOffsets);
 
     if (count == 0) {
-      console.out("no messages to delete.");
+      console.println("no messages to delete.");
       return;
     }
 
-    console.out(String.format("%d messages to be deleted over %d partitions", count, topicPartitions.size()));
+    console.printf("%d messages to be deleted over %d partitions%n", count, topicPartitions.size());
 
     final boolean hasDeleteCleanupPolicy  = hasDeleteCleanupPolicy(topic);
 
     if (!hasDeleteCleanupPolicy && !force) {
-      console.err(String.format("topic %s does not have a delete cleanup policy with, use '--force' which will add and then remove the 'delete' cleanup policy.", topic));
+      console.errPrintf("topic %s does not have a delete cleanup policy with, use '--force' which will add and then remove the 'delete' cleanup policy.%n", topic);
       return;
     } else if (hasDeleteCleanupPolicy && force) {
-      console.err(String.format("topic %s has a delete cleanup policy, --force is not necessary.", topic));
+      console.errPrintf("topic %s has a delete cleanup policy, --force is not necessary.%n", topic);
     }
 
     if (execute) {
@@ -76,7 +75,7 @@ public class TruncateTopic implements Closeable {
         }
       }
     } else {
-      console.out("enable --execute to issue command");
+      console.println("enable --execute to issue command");
     }
   }
 
@@ -99,7 +98,7 @@ public class TruncateTopic implements Closeable {
       Thread.currentThread().interrupt();
       throw new CommandException("the deleteRecords operation was interrupted, aborting; it may have still completed.");
     } catch (ExecutionException e) {
-      throw new CommandException("deleteRecords exception", e);
+      throw convert(e);
     }
   }
 
@@ -124,7 +123,7 @@ public class TruncateTopic implements Closeable {
       Thread.currentThread().interrupt();
       throw new CommandException("listOffsets operation interrupted, deleteRecords will not executed.");
     } catch (ExecutionException e) {
-      throw new CommandException("listOffsets exception", e);
+      throw convert(e);
     }
   }
 
@@ -135,7 +134,11 @@ public class TruncateTopic implements Closeable {
       Thread.currentThread().interrupt();
       throw new CommandException("describeTopics operation interrupted, deleteRecords will not executed.");
     } catch (ExecutionException e) {
-      throw new CommandException("describeTopics exception", e);
+
+//      if (e.getCause() instanceof UnknownTopicOrPartitionException) {
+//        throw new ExitEarlyException(e.getCause().getMessage());
+//      }
+      throw convert(e);
     }
   }
 
@@ -152,7 +155,7 @@ public class TruncateTopic implements Closeable {
       Thread.currentThread().interrupt();
       throw new CommandException("describeTopics operation interrupted, deleteRecords will not executed.");
     } catch (ExecutionException e) {
-      throw new CommandException("describeTopics exception", e);
+      throw convert(e);
     }
 
   }
@@ -171,7 +174,7 @@ public class TruncateTopic implements Closeable {
       Thread.currentThread().interrupt();
       throw new CommandException("incrementalAlterConfigs operation interrupted, ...");
     } catch (ExecutionException e) {
-      throw new CommandException("incrementalAlterConfigs exception", e);
+      throw convert(e);
     }
   }
 
@@ -189,8 +192,15 @@ public class TruncateTopic implements Closeable {
       Thread.currentThread().interrupt();
       throw new CommandException("incrementalAlterConfigs operation interrupted, was not able to remove the 'delete' cleanup.policy.");
     } catch (ExecutionException e) {
-      throw new CommandException("incrementalAlterConfigs exception, was not able to remove the 'delete' cleanup.policy", e);
+      throw convert(e);
     }
   }
 
+  /**
+   * return the underlying cause, if it exists, as that is the meaningful exception to propagate.
+   */
+  private CommandException convert(final ExecutionException e) {
+    final Throwable cause = e.getCause() != null ? e.getCause() : e;
+    return new CommandException(cause.getMessage(), cause);
+  }
 }

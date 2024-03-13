@@ -88,37 +88,43 @@ class TruncateTopicTest {
       truncateTopic.execute("topic_a", true, false);
 
       Assertions.assertEquals(
-              List.of(
-                      "2 messages to be deleted over 4 partitions"
-              ),
-              console.getOut());
-      Assertions.assertEquals(0, console.getErr().size());
+              """
+                      2 messages to be deleted over 4 partitions
+                      """,
+              console.asString()
+      );
 
-      console.clear();
+      Assertions.assertEquals(
+              "",
+              console.errAsString()
+      );
+
+      //
+      console.reset();
 
       publish("topic_a", "k3", "v3");
 
       truncateTopic.execute("topic_a", true, true);
 
       Assertions.assertEquals(
-              List.of(
-                      "1 messages to be deleted over 4 partitions"
-              ),
-              console.getOut());
-      Assertions.assertEquals(
-              List.of(
-                      "topic topic_a has a delete cleanup policy, --force is not necessary."
-              ),
-              console.getErr());
-      console.clear();
+              """
+                      1 messages to be deleted over 4 partitions
+                      """,
+              console.asString());
+      Assertions.assertEquals("""
+                      topic topic_a has a delete cleanup policy, --force is not necessary.
+                      """,
+              console.errAsString());
+
+      //
+      console.reset();
+
       truncateTopic.execute("topic_a", true, true);
 
-      Assertions.assertEquals(
-              List.of(
-                      "no messages to delete."
-              ),
-              console.getOut());
-      Assertions.assertEquals(0, console.getErr().size());
+      Assertions.assertEquals("""
+                      no messages to delete.
+                      """,
+              console.asString());
 
     }
   }
@@ -131,14 +137,13 @@ class TruncateTopicTest {
     try (TruncateTopic truncateTopic = new TruncateTopic(config, console)) {
       truncateTopic.execute("topic_b", true, false);
 
-      Assertions.assertEquals(
-              List.of(
-                      "1 messages to be deleted over 4 partitions"
-              ),
-              console.getOut());
-      Assertions.assertEquals(0, console.getErr().size());
+      Assertions.assertEquals("""
+                      1 messages to be deleted over 4 partitions
+                      """,
+              console.asString());
 
-      console.clear();
+      Assertions.assertEquals("", console.errAsString());
+
     }
   }
 
@@ -152,46 +157,38 @@ class TruncateTopicTest {
       //
 
       truncateTopic.execute("topic_c", true, false);
-      Assertions.assertEquals(
-              List.of(
-                      "1 messages to be deleted over 4 partitions"
-              ),
-              console.getOut());
-      Assertions.assertEquals(
-              List.of(
-                      "topic topic_c does not have a delete cleanup policy with, use '--force' which will add and then remove the 'delete' cleanup policy."
-              ),
-              console.getErr());
+      Assertions.assertEquals("""
+                      1 messages to be deleted over 4 partitions
+                      """,
+              console.asString());
+      Assertions.assertEquals("""
+                      topic topic_c does not have a delete cleanup policy with, use '--force' which will add and then remove the 'delete' cleanup policy.
+                      """,
+              console.errAsString());
       checkCleanupPolicyDoesNotHaveDelete(truncateTopic);
-      console.clear();
 
       //
+      console.reset();
 
       truncateTopic.execute("topic_c", true, true);
-      Assertions.assertEquals(
-              List.of(
-                      "1 messages to be deleted over 4 partitions"
-              ),
-              console.getOut());
-      Assertions.assertEquals(
-              List.of(
-              ),
-              console.getErr());
+      Assertions.assertEquals("""
+                      1 messages to be deleted over 4 partitions
+                      """,
+              console.asString());
+      Assertions.assertEquals("",
+              console.errAsString());
       checkCleanupPolicyDoesNotHaveDelete(truncateTopic);
-      console.clear();
 
       //
+      console.reset();
 
       truncateTopic.execute("topic_c", true, true);
-      Assertions.assertEquals(
-              List.of(
-                      "no messages to delete."
-              ),
-              console.getOut());
-      Assertions.assertEquals(
-              List.of(
-              ),
-              console.getErr());
+      Assertions.assertEquals("""
+                      no messages to delete.
+                      """,
+              console.asString());
+      Assertions.assertEquals("",
+              console.errAsString());
       checkCleanupPolicyDoesNotHaveDelete(truncateTopic);
 
     }
@@ -206,27 +203,27 @@ class TruncateTopicTest {
     try (TruncateTopic truncateTopic = new TruncateTopic(config, console)) {
       truncateTopic.execute("topic_d", false, false);
 
-      Assertions.assertEquals(
-              List.of(
-                      "2 messages to be deleted over 4 partitions",
-                      "enable --execute to issue command"
-              ),
-              console.getOut());
-      Assertions.assertEquals(0, console.getErr().size());
+      Assertions.assertEquals("""
+                      2 messages to be deleted over 4 partitions
+                      enable --execute to issue command
+                      """,
+              console.asString());
+      Assertions.assertEquals("", console.errAsString());
 
-      console.clear();
       truncateTopic.execute("topic_d", false, false);
 
-      Assertions.assertEquals(
-              List.of(
-                      "2 messages to be deleted over 4 partitions",
-                      "enable --execute to issue command"
-              ),
-              console.getOut());
-      Assertions.assertEquals(0, console.getErr().size());
+      Assertions.assertEquals("""
+                      2 messages to be deleted over 4 partitions
+                      enable --execute to issue command
+                      2 messages to be deleted over 4 partitions
+                      enable --execute to issue command
+                      """,
+              console.asString());
+      Assertions.assertEquals("", console.errAsString());
 
     }
   }
+
   private static void checkCleanupPolicyDoesNotHaveDelete(TruncateTopic truncateTopic) {
     //instead of rewriting this business-logic here, leverage the private method of truncate topic to verify.
     // no in a purest standpoint, using this to test code is not correct, because I assume this is working;
@@ -234,7 +231,7 @@ class TruncateTopicTest {
     try {
       Method method = TruncateTopic.class.getDeclaredMethod("hasDeleteCleanupPolicy", String.class);
       method.setAccessible(true);
-      Boolean value = (Boolean) method.invoke(truncateTopic,"topic_c");
+      Boolean value = (Boolean) method.invoke(truncateTopic, "topic_c");
       Assertions.assertFalse(value);
     } catch (Exception e) {
       Assertions.fail("unable to verify cleanup.policy remained unchanged.");

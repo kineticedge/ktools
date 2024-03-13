@@ -4,6 +4,7 @@ package io.kineticedge.tools;
 import io.kineticedge.tools.cmd.truncate.TruncateTopic;
 import io.kineticedge.tools.console.StdConsole;
 import io.kineticedge.tools.exception.CommandException;
+import io.kineticedge.tools.util.PropertiesUtil;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,9 +20,6 @@ import java.util.Optional;
 public class KafkaTopicsTruncate extends Subcommand {
 
     private static final Logger log = LoggerFactory.getLogger(KafkaTopicsTruncate.class);
-
-    @CommandLine.Option(names = { "--help" }, usageHelp = true, hidden = true, description = "this help message.")
-    private boolean helpRequested = false;
 
     @CommandLine.Option(names = {"--bootstrap-server"}, description = "The Kafka server to connect to (can be defined in command-config).")
     private Optional<String> bootstrapServer;
@@ -59,7 +57,7 @@ public class KafkaTopicsTruncate extends Subcommand {
 
         final Map<String, Object> map = new HashMap<>();
 
-        commandConfig.ifPresent(file -> map.putAll(loadProperties(file)));
+        commandConfig.ifPresent(file -> map.putAll(PropertiesUtil.loadProperties(file)));
         bootstrapServer.ifPresent(server -> map.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, server));
 
         if (!map.containsKey(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG)) {

@@ -1,0 +1,68 @@
+{
+  "type": "record",
+  "name": "PurchaseOrder",
+  "namespace": "io.kineticedge.ksd.common.domain",
+  "fields": [
+    {
+      "name": "timestamp",
+      "type": "double"
+    },
+    {
+      "name": "orderId",
+      "type": "string"
+    },
+    {
+      "name": "userId",
+      "type": "string"
+    },
+    {
+      "name": "storeId",
+      "type": "string"
+    },
+    {
+      "name": "items",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "Item",
+          "fields": [
+            {
+              "name": "sku",
+              "type": "string"
+            },
+            {
+              "name": "quantity",
+              "type": "int"
+            },
+            {
+              "name": "quotedPrice",
+              "type": ["null", "double"],
+              "default": null
+            },
+            {
+              "name": "price",
+              "type": ["null", "double"],
+              "default": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "tax",
+      "type": ["null", "double"],
+      "default": null
+    },
+    {
+      "name": "user",
+      "type": ["null", "string"],
+      "default": null
+    },
+    {
+      "name": "store",
+      "type": ["null", "string"],
+      "default": null
+    }
+  ]
+}

@@ -2,35 +2,46 @@ package io.kineticedge.tools.cmd.truncate;
 
 import io.kineticedge.tools.console.Console;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TestConsole implements Console {
 
-  private List<String> out = new ArrayList<>();
-  private List<String> err = new ArrayList<>();
+  private ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+  private PrintStream printStream = new PrintStream(outputStream);
 
-  @Override
-  public void out(String string) {
-    out.add(string);
+  private ByteArrayOutputStream errOutputStream = new ByteArrayOutputStream();
+  private PrintStream errPrintStream = new PrintStream(errOutputStream);
+
+  public String asString() {
+    return outputStream.toString(StandardCharsets.UTF_8);
+  }
+
+  public String errAsString() {
+    return errOutputStream.toString(StandardCharsets.UTF_8);
   }
 
   @Override
-  public void err(String string) {
-    err.add(string);
+  public PrintStream out() {
+    return printStream;
   }
 
-  public List<String> getOut() {
-    return out;
+  @Override
+  public PrintStream err() {
+    return errPrintStream;
   }
 
-  public List<String> getErr() {
-    return err;
+  public void flush() {
+    out().flush();
+    err().flush();
   }
 
-  public void clear() {
-    out.clear();
-    err.clear();
+  public void reset() {
+    outputStream.reset();
+    errOutputStream.reset();
   }
-
 }
