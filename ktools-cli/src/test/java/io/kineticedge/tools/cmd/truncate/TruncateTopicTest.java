@@ -14,17 +14,30 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 class TruncateTopicTest {
 
-  private static final KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka")).withKraft();
+  private static final Logger log = LoggerFactory.getLogger(TruncateTopicTest.class);
+
+  private static final String IMAGE = "apache/kafka-native:latest";
+
+  protected static final org.testcontainers.kafka.KafkaContainer kafka = new org.testcontainers.kafka.KafkaContainer(
+          DockerImageName.parse(IMAGE).asCompatibleSubstituteFor("apache/kafka"))
+          .withStartupTimeout(Duration.ofSeconds(15))
+          .withEnv("KAFKA_AUTO_CREATE_TOPICS_ENABLE", "false")
+          .withLogConsumer(outputFrame -> log.info(outputFrame.getUtf8String()));
+
+  //private static final KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka")).withKraft();
 
   private static Map<String, Object> config;
 

@@ -68,6 +68,7 @@ subprojects {
         implementation("com.fasterxml.jackson.core:jackson-core:$jackson_version")
         implementation("com.fasterxml.jackson.core:jackson-databind:$jackson_version")
         implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson_version")
+        implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jackson_version")
 
         implementation("com.jayway.jsonpath:json-path:$jsonpath_version")
 

@@ -2,6 +2,8 @@ package io.kineticedge.tools.cmd.kccf.jackson;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public final class ObjectMapperFactory {
 
@@ -16,7 +18,13 @@ public final class ObjectMapperFactory {
   public static ObjectMapper objectMapper() {
     return new ObjectMapper()
             .setNodeFactory(new AvoidReuseJsonNodeFactory())
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+//            .registerModule(new com.fasterxml.jackson.datatype.Jdk8Module())
+            .registerModule(new JavaTimeModule())
+            .findAndRegisterModules();
+
   }
+
 
 }

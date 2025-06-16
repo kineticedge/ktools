@@ -1,11 +1,8 @@
 package io.kineticedge.tools.console;
 
-import java.io.OutputStream;
 import java.io.PrintStream;
 
-import static java.lang.System.err;
-import static java.lang.System.out;
-
+@SuppressWarnings("resource")
 public interface Console {
 
   PrintStream out();
