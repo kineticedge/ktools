@@ -1,9 +1,20 @@
 package io.kineticedge.tools.cmd.kccf.jackson;
 
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.kineticedge.tools.domain.BrokerAndDirectory;
+import io.kineticedge.tools.jackson.BrokerAndDirectorySerializer;
+import io.kineticedge.tools.jackson.LogDirDescriptionSerializer;
+import io.kineticedge.tools.jackson.ReplicaInfoSerializer;
+import io.kineticedge.tools.jackson.TopicPartitionSerializer;
+import org.apache.kafka.clients.admin.LogDirDescription;
+import org.apache.kafka.clients.admin.ReplicaInfo;
+import org.apache.kafka.common.TopicPartition;
 
 public final class ObjectMapperFactory {
 
@@ -20,11 +31,15 @@ public final class ObjectMapperFactory {
             .setNodeFactory(new AvoidReuseJsonNodeFactory())
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-//            .registerModule(new com.fasterxml.jackson.datatype.Jdk8Module())
+            .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
             .registerModule(new JavaTimeModule())
-            .findAndRegisterModules();
-
+            .registerModule(new SimpleModule()
+                    .addSerializer(TopicPartition.class, new TopicPartitionSerializer())
+                    .addSerializer(ReplicaInfo .class, new ReplicaInfoSerializer())
+                    .addSerializer(LogDirDescription.class, new LogDirDescriptionSerializer())
+                    .addSerializer(BrokerAndDirectory.class, new BrokerAndDirectorySerializer())
+            )
+            .setDefaultPrettyPrinter(new DefaultPrettyPrinter().withArrayIndenter(new DefaultIndenter("  ", "\n")));
   }
-
 
 }

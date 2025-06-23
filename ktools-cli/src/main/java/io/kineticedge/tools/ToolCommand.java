@@ -9,7 +9,7 @@ import java.util.TreeMap;
 
 import static java.lang.System.out;
 
-@CommandLine.Command(name = "tool-command", description = "", subcommands = {KafkaTopicsTruncate.class, KafkaConsoleConsumerFilter.class, KafkaRemoveBrokerAsLeader.class})
+@CommandLine.Command(name = "tool-command", description = "", subcommands = {KafkaTopicsTruncate.class, KafkaConsoleConsumerFilter.class, KafkaMoveLeadersOffBroker.class, KafkaMovePartitionsToDirectory.class})
 public class ToolCommand implements Runnable {
 
   @CommandLine.Option(names = {"--help"}, usageHelp = true, description = "this help message.")

@@ -1,5 +1,6 @@
 package io.kineticedge.tools.cmd.leaders;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kineticedge.tools.cmd.kccf.jackson.ObjectMapperFactory;
@@ -31,14 +32,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class MoveLeadersRunner implements Closeable {
+public class MoveLeadersOffBroker implements Closeable {
 
   private static final ObjectMapper objectMapper = ObjectMapperFactory.objectMapper();
 
   private final Admin admin;
   private final Console console;
 
-  public MoveLeadersRunner(final Map<String, Object> adminConfig, final Console console) {
+  public MoveLeadersOffBroker(final Map<String, Object> adminConfig, final Console console) {
     admin = Admin.create(adminConfig);
     this.console = console;
   }
@@ -76,7 +77,7 @@ public class MoveLeadersRunner implements Closeable {
 
     Map<TopicPartition, Optional<NewPartitionReassignment>> changes = undoReassignment(brokerId, currentAssignments(), restore);
 
-    toConsole(changes);
+    toConsole(forDisplay(changes));
 
     if (execute) {
       admin.alterPartitionReassignments(changes).all().get();

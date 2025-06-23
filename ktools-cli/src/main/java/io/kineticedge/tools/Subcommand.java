@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 public abstract class Subcommand implements Runnable {
 
+
     @CommandLine.Option(names = { "--help" }, usageHelp = true, hidden = true, description = "this help message.")
     protected boolean helpRequested = false;
 
