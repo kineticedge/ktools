@@ -1,0 +1,36 @@
+{
+  "$type": "io.kineticedge.ksd.common.domain.PurchaseOrder",
+  "timestamp": 1710077837.168611172,
+  "orderId": "SV-00001549",
+  "userId": "5066",
+  "storeId": "180",
+  "items": [
+    {
+      "sku": "001",
+      "quantity": 3,
+      "quotedPrice": null,
+      "price": null
+    },
+    {
+      "sku": "002",
+      "quantity": 8,
+      "quotedPrice": null,
+      "price": null
+    },
+    {
+      "sku": "010",
+      "quantity": 2,
+      "quotedPrice": null,
+      "price": null
+    },
+    {
+      "sku": "234",
+      "quantity": 3,
+      "quotedPrice": null,
+      "price": null
+    }
+  ],
+  "tax": null,
+  "user": null,
+  "store": null
+}
